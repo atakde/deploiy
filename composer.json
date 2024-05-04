@@ -1,0 +1,17 @@
+{
+    "name": "atakde/deploiy",
+    "autoload": {
+        "psr-4": {
+            "Atakde\\Deploiy\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Atakan Demircioğlu",
+            "email": "31544037+atakde@users.noreply.github.com"
+        }
+    ],
+    "require": {
+        "symfony/yaml": "^7.0"
+    }
+}
