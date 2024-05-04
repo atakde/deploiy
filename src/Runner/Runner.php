@@ -39,10 +39,16 @@ class Runner implements RunnerInterface
 
     private function goToDeployPath(string $path): void
     {
+        // check path ends with a slash
+        if (substr($path, -1) !== '/') {
+            $path .= '/';
+        }
+
         echo "Going to deploy path: $path\n";
         chdir($path);
 
-        if (getcwd() === $path) {
+        $currentPath = getcwd() . '/';
+        if ($currentPath === $path) {
             echo "Current path: $path\n";
         } else {
             throw new \Exception("Error: Could not change to path $path");
