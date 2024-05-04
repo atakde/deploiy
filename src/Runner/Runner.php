@@ -62,6 +62,7 @@ class Runner implements RunnerInterface
             $returnVar = 0;
             exec($command, $output, $returnVar);
             if ($returnVar !== 0) {
+                var_dump($output);
                 echo "Error: Command '$command' failed with exit code $returnVar\n";
                 return null;
             }
