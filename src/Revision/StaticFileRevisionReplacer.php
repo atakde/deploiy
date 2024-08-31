@@ -22,6 +22,12 @@ class StaticFileRevisionReplacer
         $files = glob($path . '/*');
         $revision = $this->getRevision();
 
+        echo "Revision: $revision\n";
+        var_dump($revision);
+        var_dump($files);
+
+        echo "Replacing revision in files\n";
+
         foreach ($files as $file) {
             $content = file_get_contents($file);
             $content = str_replace('{REV}', $revision, $content);

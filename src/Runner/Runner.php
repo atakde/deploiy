@@ -75,6 +75,7 @@ class Runner implements RunnerInterface
     {
         // is revision replace enabled
         if ($deployerModel->postDeploy->getConfig()['enableRevisionReplace']) {
+            echo "[Revision Replacer]: Enabled\n";
             $this->runRevisionReplacer($deployerModel->getEnvironment()->getDeployPath());
         }
 
