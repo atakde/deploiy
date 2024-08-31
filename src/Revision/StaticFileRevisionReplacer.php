@@ -19,7 +19,8 @@ class StaticFileRevisionReplacer
 
     private function replaceRevision(string $path): void
     {
-        $files = glob($path . '/*');
+        $extensions = ['php', 'html'];
+        $files = glob($path . '*');
         $revision = $this->getRevision();
 
         echo "Revision: $revision\n";
@@ -29,6 +30,18 @@ class StaticFileRevisionReplacer
         echo "Replacing revision in files\n";
 
         foreach ($files as $file) {
+            if (is_dir($file)) {
+                echo "Directory: $file\n";
+                $this->replaceRevision($file . '/');
+                continue;
+            }
+
+            $extension = pathinfo($file, PATHINFO_EXTENSION);
+            if (!in_array($extension, $extensions)) {
+                echo "Skipping file: $file\n";
+                continue;
+            }
+
             $content = file_get_contents($file);
             $content = str_replace('{REV}', $revision, $content);
             file_put_contents($file, $content);
