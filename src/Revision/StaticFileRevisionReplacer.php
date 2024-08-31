@@ -22,6 +22,12 @@ class StaticFileRevisionReplacer
         $extensions = ['php', 'html', 'txt'];
         $skipPaths = ['vendor', 'node_modules', 'public'];
 
+        $this->processDirectory($path, $extensions, $skipPaths);
+    }
+
+    private function processDirectory(string $path, array $extensions, array $skipPaths): void
+    {
+        // Ensure path has a trailing slash
         if (!str_ends_with($path, '/')) {
             $path .= '/';
         }
@@ -30,27 +36,30 @@ class StaticFileRevisionReplacer
         $revision = $this->getRevision();
 
         echo "Revision: $revision\n";
-        var_dump($files);
 
         foreach ($files as $file) {
-            if (is_dir($file) && in_array(basename($file), $skipPaths)) {
-                echo "Skipping directory: $file\n";
-                continue;
-            }
+            if (is_dir($file)) {
+                if (in_array(basename($file), $skipPaths)) {
+                    echo "Skipping directory: $file\n";
+                    continue;
+                }
 
-            $extension = pathinfo($file, PATHINFO_EXTENSION);
-            if (!in_array($extension, $extensions)) {
-                echo "Skipping file: $file\n";
-                continue;
-            }
-
-            $content = file_get_contents($file);
-            $content = str_replace('{REV}', $revision, $content);
-            $resp = file_put_contents($file, $content);
-            if ($resp === false) {
-                echo "Failed to write to file: $file\n";
+                $this->processDirectory($file, $extensions, $skipPaths);
             } else {
-                echo "Updated file: $file\n";
+                $extension = pathinfo($file, PATHINFO_EXTENSION);
+                if (!in_array($extension, $extensions)) {
+                    echo "Skipping file: $file\n";
+                    continue;
+                }
+
+                $content = file_get_contents($file);
+                $content = str_replace('{REV}', $revision, $content);
+                $resp = file_put_contents($file, $content);
+                if ($resp === false) {
+                    echo "Failed to write to file: $file\n";
+                } else {
+                    echo "Updated file: $file\n";
+                }
             }
         }
     }
