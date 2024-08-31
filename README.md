@@ -10,6 +10,10 @@ deploy:
     port: 80
     deployPath: "/var/www/your_path/"
   preDeploy:
+      enableRevisionReplace: true
+      revisionPlaceholder: "{REV}"
+      revisionReplecableExtensions: ["js", "html"]
+      revisionReplaceSkipPaths: ["node_modules", "vendor"]
     commands:
       - name: "whoami"
         command: "whoami"
@@ -26,4 +30,21 @@ deploy:
       - name: "say finished"
         command: "echo 'finished'"
 
+```
+### Example of deploy.php
+
+```php
+<?php
+
+try {
+  require_once '/any_folder/deploiy/vendor/autoload.php';
+
+  $yamlParser = new \Atakde\Deploiy\Parser\YamlParser();
+  $runner = new \Atakde\Deploiy\Runner\Runner();
+  $deployer = new \Atakde\Deploiy\Deployer($yamlParser, $runner);
+
+  $deployer->deployWithConfigPath('/any_folder/any_project/deploy.yaml');
+
+} catch (\Throwable $th) {
+}
 ```
