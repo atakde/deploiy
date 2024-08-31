@@ -5,7 +5,6 @@ namespace Atakde\Deploiy\Parser;
 use Atakde\Deploiy\Models\DeployerModel;
 use Atakde\Deploiy\Models\DeployModel;
 use Atakde\Deploiy\Models\EnvironmentModel;
-use Atakde\Deploiy\Models\SourceModel;
 use Atakde\Deploiy\Parser\ParserInterface;
 use Symfony\Component\Yaml\Yaml;
 
