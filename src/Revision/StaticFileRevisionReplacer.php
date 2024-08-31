@@ -53,6 +53,11 @@ class StaticFileRevisionReplacer
                 }
 
                 $content = file_get_contents($file);
+                if (empty($content) || strpos($content, '{REV}') === false) {
+                    echo "Empty file: $file\n";
+                    continue;
+                }
+
                 $content = str_replace('{REV}', $revision, $content);
                 $resp = file_put_contents($file, $content);
                 if ($resp === false) {
