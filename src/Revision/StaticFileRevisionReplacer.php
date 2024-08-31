@@ -19,26 +19,22 @@ class StaticFileRevisionReplacer
 
     private function replaceRevision(string $path): void
     {
-        $extensions = ['php', 'html'];
+        $extensions = ['php', 'html', 'txt'];
         $skipPaths = ['vendor', 'node_modules', 'public'];
+
+        if (!str_ends_with($path, '/')) {
+            $path .= '/';
+        }
+
         $files = glob($path . '*');
         $revision = $this->getRevision();
 
         echo "Revision: $revision\n";
-        var_dump($revision);
         var_dump($files);
-
-        echo "Replacing revision in files\n";
 
         foreach ($files as $file) {
             if (is_dir($file) && in_array(basename($file), $skipPaths)) {
                 echo "Skipping directory: $file\n";
-                continue;
-            }
-
-            if (is_dir($file)) {
-                echo "Directory: $file\n";
-                $this->replaceRevision($file . '/');
                 continue;
             }
 
@@ -50,7 +46,12 @@ class StaticFileRevisionReplacer
 
             $content = file_get_contents($file);
             $content = str_replace('{REV}', $revision, $content);
-            file_put_contents($file, $content);
+            $resp = file_put_contents($file, $content);
+            if ($resp === false) {
+                echo "Failed to write to file: $file\n";
+            } else {
+                echo "Updated file: $file\n";
+            }
         }
     }
 
