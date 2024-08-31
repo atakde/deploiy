@@ -20,6 +20,7 @@ class StaticFileRevisionReplacer
     private function replaceRevision(string $path): void
     {
         $extensions = ['php', 'html'];
+        $skipPaths = ['vendor', 'node_modules'];
         $files = glob($path . '*');
         $revision = $this->getRevision();
 
@@ -30,6 +31,11 @@ class StaticFileRevisionReplacer
         echo "Replacing revision in files\n";
 
         foreach ($files as $file) {
+            if (is_dir($file) && in_array(basename($file), $skipPaths)) {
+                echo "Skipping directory: $file\n";
+                continue;
+            }
+
             if (is_dir($file)) {
                 echo "Directory: $file\n";
                 $this->replaceRevision($file . '/');
