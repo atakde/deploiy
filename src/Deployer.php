@@ -18,4 +18,10 @@ class Deployer
         $deployModel = $this->parser->parse($content);
         $this->runner->run($deployModel);
     }
+
+    public function deployWithConfigPath(string $configPath): void
+    {
+        $content = file_get_contents($configPath);
+        $this->deploy($content);
+    }
 }
