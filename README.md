@@ -48,3 +48,10 @@ try {
 } catch (\Throwable $th) {
 }
 ```
+
+### Nginx conf example if needed
+```
+location /deploy-webhook {
+  try_files $uri $uri/ /deploy.php?$query_string;
+}
+```
