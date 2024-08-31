@@ -3,23 +3,23 @@
 namespace Atakde\Deploiy\Runner;
 
 use Atakde\Deploiy\Models\DeployerModel;
+use Atakde\Deploiy\Revision\StaticFileRevisionReplacer;
 
 class Runner implements RunnerInterface
 {
     public function run(DeployerModel $deployerModel): void
     {
-        echo "*** DEPLOY ***\n";
-        $this->goToDeployPath($deployerModel->getEnvironment()->getDeployPath());
+        $deployPath = $deployerModel->getEnvironment()->getDeployPath();
+
+        $this->goToDeployPath($deployPath);
         $this->runPreDeploy($deployerModel);
         $this->runPostDeploy($deployerModel);
-        echo "*** END DEPLOY ***\n";
     }
 
     public function runPreDeploy(DeployerModel $deployerModel): void
     {
-        echo "*** PRE DEPLOY ***\n";
-
         if (empty($deployerModel->preDeploy->getCommands())) {
+            echo "No pre deploy commands\n";
             return;
         }
 
@@ -30,11 +30,9 @@ class Runner implements RunnerInterface
 
             $response = $this->runCommand($command->getCommand());
             if ($response !== null) {
-                echo "Response: $response\n";
+                echo "[Response]: $response\n";
             }
         }
-
-        echo "*** END PRE DEPLOY COMMAND ***\n";
     }
 
     private function goToDeployPath(string $path): void
@@ -75,9 +73,13 @@ class Runner implements RunnerInterface
 
     public function runPostDeploy(DeployerModel $deployerModel): void
     {
-        echo "*** POST DEPLOY ***\n";
+        // is revision replace enabled
+        if ($deployerModel->postDeploy->getConfig()['enableRevisionReplace']) {
+            $this->runRevisionReplacer($deployerModel->getEnvironment()->getDeployPath());
+        }
 
         if (empty($deployerModel->postDeploy->getCommands())) {
+            echo "No post deploy commands\n";
             return;
         }
 
@@ -88,10 +90,14 @@ class Runner implements RunnerInterface
 
             $response = $this->runCommand($command->getCommand());
             if ($response !== null) {
-                echo "Response: $response\n";
+                echo "[Response]: $response\n";
             }
         }
+    }
 
-        echo "*** END POST DEPLOY COMMAND ***\n";
+    public function runRevisionReplacer(string $path): void
+    {
+        $replacer = new StaticFileRevisionReplacer([$path]);
+        $replacer->handleReplace();
     }
 }
