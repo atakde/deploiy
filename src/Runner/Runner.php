@@ -76,7 +76,7 @@ class Runner implements RunnerInterface
         // is revision replace enabled
         if ($deployerModel->postDeploy->getConfig()['enableRevisionReplace']) {
             echo "[Revision Replacer]: Enabled\n";
-            $this->runRevisionReplacer($deployerModel->getEnvironment()->getDeployPath());
+            $this->runRevisionReplacer($deployerModel);
         }
 
         if (empty($deployerModel->postDeploy->getCommands())) {
@@ -96,9 +96,13 @@ class Runner implements RunnerInterface
         }
     }
 
-    public function runRevisionReplacer(string $path): void
+    public function runRevisionReplacer(DeployerModel $deployerModel): void
     {
-        $replacer = new StaticFileRevisionReplacer([$path]);
+        $path = $deployerModel->getEnvironment()->getDeployPath();
+        $revisionPlaceholder = $deployerModel->postDeploy->getConfig()['revisionPlaceholder'] ?? '{REV}';
+        $revisionReplecableExtensions = $deployerModel->postDeploy->getConfig()['revisionReplecableExtensions'] ?? [];
+        $revisionReplaceSkipPaths = $deployerModel->postDeploy->getConfig()['revisionReplaceSkipPaths'] ?? [];
+        $replacer = new StaticFileRevisionReplacer([$path], $revisionPlaceholder, $revisionReplecableExtensions, $revisionReplaceSkipPaths);
         $replacer->handleReplace();
     }
 }

@@ -5,7 +5,10 @@ namespace Atakde\Deploiy\Revision;
 class StaticFileRevisionReplacer
 {
     public function __construct(
-        private array $paths = [],
+        private array $paths,
+        private string $revisionPlaceholder,
+        private array $revisionReplecableExtensions,
+        private array $revisionReplaceSkipPaths,
         private string $revisionAlgorithm = 'time'
     ) {
     }
@@ -19,14 +22,14 @@ class StaticFileRevisionReplacer
 
     private function replaceRevision(string $path): void
     {
-        $extensions = ['php', 'html', 'txt'];
-        $skipPaths = ['vendor', 'node_modules', 'public'];
-
-        $this->processDirectory($path, $extensions, $skipPaths);
+        $this->processDirectory($path);
     }
 
-    private function processDirectory(string $path, array $extensions, array $skipPaths): void
+    private function processDirectory(string $path): void
     {
+        $extensions = $this->revisionReplecableExtensions;
+        $skipPaths = $this->revisionReplaceSkipPaths;
+
         // Ensure path has a trailing slash
         if (!str_ends_with($path, '/')) {
             $path .= '/';
@@ -44,7 +47,7 @@ class StaticFileRevisionReplacer
                     continue;
                 }
 
-                $this->processDirectory($file, $extensions, $skipPaths);
+                $this->processDirectory($file);
             } else {
                 $extension = pathinfo($file, PATHINFO_EXTENSION);
                 if (!in_array($extension, $extensions)) {
@@ -53,12 +56,12 @@ class StaticFileRevisionReplacer
                 }
 
                 $content = file_get_contents($file);
-                if (empty($content) || strpos($content, '{REV}') === false) {
+                if (empty($content) || strpos($content, $this->revisionPlaceholder) === false) {
                     echo "Skipping file (no need to update): $file\n";
                     continue;
                 }
 
-                $content = str_replace('{REV}', $revision, $content);
+                $content = str_replace($this->revisionPlaceholder, $revision, $content);
                 $resp = file_put_contents($file, $content);
                 if ($resp === false) {
                     echo "Failed to write to file: $file\n";
