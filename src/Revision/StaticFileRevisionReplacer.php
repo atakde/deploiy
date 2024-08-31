@@ -20,7 +20,7 @@ class StaticFileRevisionReplacer
     private function replaceRevision(string $path): void
     {
         $extensions = ['php', 'html'];
-        $skipPaths = ['vendor', 'node_modules'];
+        $skipPaths = ['vendor', 'node_modules', 'public'];
         $files = glob($path . '*');
         $revision = $this->getRevision();
 
