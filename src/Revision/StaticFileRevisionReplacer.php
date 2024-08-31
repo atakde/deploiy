@@ -54,7 +54,7 @@ class StaticFileRevisionReplacer
 
                 $content = file_get_contents($file);
                 if (empty($content) || strpos($content, '{REV}') === false) {
-                    echo "Empty file: $file\n";
+                    echo "Skipping file (no need to update): $file\n";
                     continue;
                 }
 
